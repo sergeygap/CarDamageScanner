@@ -1,4 +1,4 @@
-package com.gap.presentation.welcome
+package com.gap.presentation.autorization
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,13 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.gap.presentation.R
 
-
-class StartFragment : Fragment() {
+class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_start, container, false)
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
-
 }
