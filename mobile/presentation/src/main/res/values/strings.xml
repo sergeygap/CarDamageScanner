@@ -4,8 +4,10 @@
     <string name="choose_from_gallery">Выбрать из галереи</string>
     <string name="open">Открыть</string>
     <string name="permission_denied">Разрешение отклонено</string>
-    <string name="permission_denied_forever_message">"You have denied permissions forever. You can change your decision in the app settings.\n\nWould you like to open app settings?"</string>
+    <string name="permission_denied_forever_message">"Вы навсегда отказали в разрешениях. Вы можете изменить свое решение в настройках приложения.\n\Хотите открыть настройки приложения?"</string>
     <string name="tv_description_bottom">Сделайте фотографии в определенных ракурсах и система предоставит отчет о найденных повреждениях</string>
     <string name="tv_description_top">Система определения повреждения автомобилей</string>
     <string name="welcome_picture">welcome picture</string>
+    <string name="start_main_text">Зарегистрируйтесь или зайдите в уже существующий аккаунт</string>
+    <string name="next">Далее</string>
 </resources>

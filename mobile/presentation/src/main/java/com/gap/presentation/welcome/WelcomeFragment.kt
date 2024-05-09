@@ -32,6 +32,14 @@ class WelcomeFragment : Fragment() {
         ActivityResultContracts.RequestPermission(),
         ::onGotPermissionsResultForCamera
     )
+    private val resultLauncherCamera =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val imageBitmap = data?.extras?.get("data") as Bitmap
+                binding.ivEnterPhoto.setImageBitmap(imageBitmap)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,14 +57,9 @@ class WelcomeFragment : Fragment() {
     private fun workWithUI() {
         with(binding) {
             btnWelcome.setOnClickListener {
-                openGalleryOrTakePhoto()
+                setOnClickListenersInCustomDialog(createAlertDialog())
             }
         }
-    }
-
-    private fun openGalleryOrTakePhoto() {
-        val customDialogBinding = createAlertDialog()
-        setOnClickListenersInCustomDialog(customDialogBinding)
     }
 
     private fun setOnClickListenersInCustomDialog(binding: CustomDialogBinding) {
@@ -81,19 +84,6 @@ class WelcomeFragment : Fragment() {
         return dialogBinding
     }
 
-    private fun onCameraPermissionGranted() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        resultLauncherCamera.launch(intent)
-    }
-
-    private val resultLauncherCamera =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                binding.ivEnterPhoto.setImageBitmap(imageBitmap)
-            }
-        }
 
     private fun onGotPermissionsResultForCamera(grantResults: Boolean) {
         Log.d(TAG, "onRequestPermissionsResult: working")
@@ -103,13 +93,18 @@ class WelcomeFragment : Fragment() {
             /**
             Запретили навсегда или нет, true -> показать объяснения, false -> навсегда
              */
-            if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 Toast.makeText(requireContext(), "permission denied", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 askUserForOpeningAppSettings()
             }
         }
+    }
+
+    private fun onCameraPermissionGranted() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        resultLauncherCamera.launch(intent)
     }
 
     private fun askUserForOpeningAppSettings() {
@@ -146,7 +141,6 @@ class WelcomeFragment : Fragment() {
     }
 
     companion object {
-        private const val RQ_PERMISSION_CAMERA = 0
         private const val TAG = "WelcomeFragmentLog"
     }
 }
