@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.CarDamageScanner" parent="Base.Theme.CarDamageScanner" />
+
+    <style name="EDIT_TEXT" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxBackgroundColor">@color/white</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="boxStrokeColor">@color/main</item>
+        <item name="hintTextColor">@color/black</item>
+    </style>
 </resources>
