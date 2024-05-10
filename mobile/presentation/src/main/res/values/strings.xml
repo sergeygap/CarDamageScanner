@@ -13,4 +13,9 @@
     <string name="input_your_number">Введите номер телефона</string>>
     <string name="button_back">button back</string>
     <string name="Enter">Вход</string>
+    <string name="prefix_number">+7 (</string>
+    <string name="mask_on_number">+7 ([000]) [000]-[00]-[00]</string>
+    <string name="helper_text_number">Вводите номер в формате +7 (999) 999–99–99</string>
+    <string name="empty_string" />
+
 </resources>
