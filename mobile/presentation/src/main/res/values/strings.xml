@@ -20,5 +20,6 @@
     <string name="your_code">Ваш код</string>
     <string name="text_for_code_input">На указанный вами номер <u>%s</u> отправлено SMS с кодом подтверждения. \nВведите его в поле ниже.</string>
     <string name="input_code_timer">Отправить код повторно можно через %d секунд</string>
+    <string name="send_code_again">Отправить код повторно</string>
 
 </resources>

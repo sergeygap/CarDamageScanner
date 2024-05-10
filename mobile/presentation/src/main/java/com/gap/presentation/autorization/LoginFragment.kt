@@ -6,9 +6,11 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.gap.presentation.R
+import com.gap.presentation.autorization.InputCodeFragment.Companion.NUMBER_KEY
 import com.gap.presentation.databinding.FragmentLoginBinding
 import com.redmadrobot.inputmask.MaskedTextChangedListener
 import com.redmadrobot.inputmask.MaskedTextChangedListener.ValueListener
@@ -41,7 +43,8 @@ class LoginFragment : Fragment() {
             navController.navigate(R.id.action_loginFragment_to_startFragment)
         }
         binding.btnSign.setOnClickListener {
-            navController.navigate(R.id.action_loginFragment_to_inputCodeFragment)
+            navController.navigate(R.id.action_loginFragment_to_inputCodeFragment,
+                bundleOf(NUMBER_KEY to binding.etNumber.text?.trim().toString()))
         }
     }
 
