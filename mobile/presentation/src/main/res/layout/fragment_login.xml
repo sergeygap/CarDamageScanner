@@ -36,8 +36,8 @@
         android:layout_marginBottom="24dp"
         android:fontFamily="@font/mulish"
         android:text="@string/Enter"
-        android:textColor="@color/black"
-        android:textSize="20sp"
+        android:textColor="@color/main"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

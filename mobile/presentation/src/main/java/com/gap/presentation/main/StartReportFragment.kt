@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.gap.presentation.R
 import com.gap.presentation.databinding.CustomDialogBinding
 import com.gap.presentation.databinding.FragmentStartReportBinding
@@ -27,6 +28,7 @@ class StartReportFragment : Fragment() {
     private var _binding: FragmentStartReportBinding? = null
     private val binding: FragmentStartReportBinding
         get() = _binding ?: throw RuntimeException("WelcomeFragment == null")
+    private val navController by lazy { findNavController() }
 
     private val cameraPermissionRequestLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -57,7 +59,8 @@ class StartReportFragment : Fragment() {
     private fun workWithUI() {
         with(binding) {
             btnWelcome.setOnClickListener {
-                setOnClickListenersInCustomDialog(createAlertDialog())
+                navController.navigate(R.id.action_startReportFragment_to_sendPhotosFragment)
+//                setOnClickListenersInCustomDialog(createAlertDialog())
             }
             binding.ibBack.setOnClickListener {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
