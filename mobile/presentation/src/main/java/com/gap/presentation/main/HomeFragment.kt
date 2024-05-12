@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.gap.presentation.R
 import com.gap.presentation.autorization.InputCodeFragment
 import com.gap.presentation.databinding.FragmentHomeBinding
@@ -15,6 +16,7 @@ import com.gap.presentation.main.adapters.HomeAdapter
 class HomeFragment : Fragment() {
 
     private lateinit var adapter: HomeAdapter
+    private val navController by lazy { findNavController() }
 
     private var _binding: FragmentHomeBinding? = null
     private val binding
@@ -28,8 +30,21 @@ class HomeFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        saveStartFragment()
+        saveStartFragment(true)
         workWithRV()
+        workWithButtons()
+    }
+
+    private fun workWithButtons() {
+        with(binding) {
+            ivLogout.setOnClickListener {
+                saveStartFragment(false)
+                navController.navigate(R.id.action_homeFragment_to_startFragment)
+            }
+            btnCreateReport.setOnClickListener {
+                navController.navigate(R.id.action_homeFragment_to_reportFragment)
+            }
+        }
     }
 
     private fun workWithRV() {
@@ -37,11 +52,11 @@ class HomeFragment : Fragment() {
         binding.recyclerView.adapter = adapter
     }
 
-    private fun saveStartFragment() {
+    private fun saveStartFragment(isHomeScreenFragmentStart: Boolean) {
         val sharedPreferences = requireActivity()
             .getSharedPreferences(START_FRAGMENT_TAG, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putBoolean(REACHED_HOME_FRAGMENT, true)
+        editor.putBoolean(REACHED_HOME_FRAGMENT, isHomeScreenFragmentStart)
         editor.apply()
     }
 
