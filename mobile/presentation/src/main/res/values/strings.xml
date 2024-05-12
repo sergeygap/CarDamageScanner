@@ -25,5 +25,7 @@
     <string name="my_reports">Мои отчёты</string>
     <string name="scan_car">Просканировать автомобиль</string>
     <string name="logout_button">logout button</string>
+    <string name="create_your_first_report">Создайте свой первый отчет</string>
+    <string name="arrow_for_create_first_report">arrow for create first report</string>
 
 </resources>

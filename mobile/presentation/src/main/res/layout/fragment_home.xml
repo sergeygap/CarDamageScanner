@@ -17,6 +17,7 @@
         android:text="@string/my_reports"
         android:textColor="@color/main"
         android:textSize="24sp"
+
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +29,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="2dp"
+        android:visibility="visible"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/btn_create_report"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,6 +39,21 @@
         app:layout_constraintVertical_bias="1.0"
         tools:itemCount="100"
         tools:listitem="@layout/item_report" />
+
+    <TextView
+        android:id="@+id/tv_empty_rv"
+        style="@style/TEXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_your_first_report"
+        android:textSize="22sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/btn_create_report"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.8" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_create_report"
@@ -61,10 +78,24 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginEnd="16dp"
+        android:contentDescription="@string/logout_button"
         android:src="@drawable/logout_48px"
         app:layout_constraintBottom_toBottomOf="@+id/tv_my_reports"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_my_reports"
-        android:contentDescription="@string/logout_button" />
+        app:layout_constraintTop_toTopOf="@+id/tv_my_reports" />
+
+    <ImageView
+        android:id="@+id/iv_arrow_down"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="20dp"
+        android:src="@drawable/arrow_down"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_create_report"
+        app:layout_constraintEnd_toEndOf="@+id/tv_empty_rv"
+        app:layout_constraintStart_toStartOf="@+id/tv_empty_rv"
+        app:layout_constraintTop_toTopOf="@+id/tv_empty_rv"
+        android:contentDescription="@string/arrow_for_create_first_report" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
