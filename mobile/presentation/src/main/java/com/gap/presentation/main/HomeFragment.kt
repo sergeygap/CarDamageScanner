@@ -1,4 +1,4 @@
-package com.gap.presentation.autorization
+package com.gap.presentation.main
 
 import android.content.Context
 import android.os.Bundle

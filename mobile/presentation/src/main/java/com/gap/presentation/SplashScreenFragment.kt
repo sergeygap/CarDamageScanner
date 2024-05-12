@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.gap.presentation.autorization.HomeFragment
+import com.gap.presentation.main.HomeFragment
 
 class SplashScreenFragment : Fragment() {
     private val navController by lazy { findNavController() }

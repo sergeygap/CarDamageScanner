@@ -65,7 +65,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.gap.presentation.autorization.HomeFragment"
+        android:name="com.gap.presentation.main.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
@@ -75,6 +75,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_homeFragment_to_reportFragment"
+            app:destination="@id/reportFragment" />
     </fragment>
     <fragment
         android:id="@+id/welcomeFragment"
@@ -94,4 +97,17 @@
         android:name="com.gap.presentation.SplashScreenFragment"
         android:label="fragment_splash_screen"
         tools:layout="@layout/fragment_splash_screen" />
+    <fragment
+        android:id="@+id/reportFragment"
+        android:name="com.gap.presentation.main.ReportFragment"
+        android:label="fragment_report"
+        tools:layout="@layout/fragment_report">
+        <action
+            android:id="@+id/action_reportFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 </navigation>
