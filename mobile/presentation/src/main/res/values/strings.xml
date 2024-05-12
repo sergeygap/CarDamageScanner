@@ -21,9 +21,8 @@
     <string name="text_for_code_input">На указанный вами номер <u>%s</u> отправлено SMS с кодом подтверждения. \nВведите его в поле ниже.</string>
     <string name="input_code_timer">Отправить код повторно можно через %d секунд</string>
     <string name="send_code_again">Отправить код повторно</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="my_reports">Мой отчёты</string>
+    <string name="my_reports">Мои отчёты</string>
     <string name="scan_car">Просканировать автомобиль</string>
 
 </resources>

@@ -7,18 +7,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gap.presentation.R
+import com.gap.presentation.autorization.InputCodeFragment
+import com.gap.presentation.databinding.FragmentHomeBinding
+import com.gap.presentation.databinding.FragmentInputCodeBinding
+import com.gap.presentation.main.adapters.HomeAdapter
 
 class HomeFragment : Fragment() {
+
+    private lateinit var adapter: HomeAdapter
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding
+        get() = _binding ?: throw RuntimeException("HomeFragment == null")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         saveStartFragment()
+        workWithRV()
+    }
+
+    private fun workWithRV() {
+        adapter = HomeAdapter()
+        binding.recyclerView.adapter = adapter
     }
 
     private fun saveStartFragment() {
@@ -27,6 +43,11 @@ class HomeFragment : Fragment() {
         val editor = sharedPreferences.edit()
         editor.putBoolean(REACHED_HOME_FRAGMENT, true)
         editor.apply()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     companion object {
