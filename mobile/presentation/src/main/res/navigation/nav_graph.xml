@@ -69,8 +69,8 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_welcomeFragment"
-            app:destination="@id/welcomeFragment"
+            android:id="@+id/action_homeFragment_to_startReportFragment"
+            app:destination="@id/startReportFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -91,10 +91,10 @@
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
-        android:id="@+id/welcomeFragment"
-        android:name="com.gap.presentation.welcome.WelcomeFragment"
+        android:id="@+id/startReportFragment"
+        android:name="com.gap.presentation.main.StartReportFragment"
         android:label="fragment_welcome"
-        tools:layout="@layout/fragment_welcome">
+        tools:layout="@layout/fragment_start_report">
         <action
             android:id="@+id/action_welcomeFragment_to_homeFragment"
             app:destination="@id/homeFragment"

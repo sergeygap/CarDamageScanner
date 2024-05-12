@@ -1,4 +1,4 @@
-package com.gap.presentation.welcome
+package com.gap.presentation.main
 
 import android.Manifest
 import android.app.Activity
@@ -19,13 +19,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.gap.presentation.R
 import com.gap.presentation.databinding.CustomDialogBinding
-import com.gap.presentation.databinding.FragmentWelcomeBinding
+import com.gap.presentation.databinding.FragmentStartReportBinding
 
 
-class WelcomeFragment : Fragment() {
+class StartReportFragment : Fragment() {
 
-    private var _binding: FragmentWelcomeBinding? = null
-    private val binding: FragmentWelcomeBinding
+    private var _binding: FragmentStartReportBinding? = null
+    private val binding: FragmentStartReportBinding
         get() = _binding ?: throw RuntimeException("WelcomeFragment == null")
 
     private val cameraPermissionRequestLauncher = registerForActivityResult(
@@ -45,7 +45,7 @@ class WelcomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWelcomeBinding.inflate(inflater, container, false)
+        _binding = FragmentStartReportBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -58,6 +58,9 @@ class WelcomeFragment : Fragment() {
         with(binding) {
             btnWelcome.setOnClickListener {
                 setOnClickListenersInCustomDialog(createAlertDialog())
+            }
+            binding.ibBack.setOnClickListener {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
     }

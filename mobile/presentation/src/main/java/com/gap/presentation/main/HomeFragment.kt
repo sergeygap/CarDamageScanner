@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
                 navController.navigate(R.id.action_homeFragment_to_startFragment)
             }
             btnCreateReport.setOnClickListener {
-                navController.navigate(R.id.action_homeFragment_to_reportFragment)
+                navController.navigate(R.id.action_homeFragment_to_startReportFragment)
             }
         }
     }
