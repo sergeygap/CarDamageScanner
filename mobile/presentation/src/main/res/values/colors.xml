@@ -6,5 +6,6 @@
     <color name="text">#A9B4CD</color>
     <color name="error">#FF0000</color>
     <color name="grey">#F3F3F3</color>
+    <color name="grey_date">#A9B4CD</color>
 
 </resources>

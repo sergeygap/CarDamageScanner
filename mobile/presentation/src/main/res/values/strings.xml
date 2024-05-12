@@ -21,11 +21,15 @@
     <string name="text_for_code_input">На указанный вами номер <u>%s</u> отправлено SMS с кодом подтверждения. \nВведите его в поле ниже.</string>
     <string name="input_code_timer">Отправить код повторно можно через %d секунд</string>
     <string name="send_code_again">Отправить код повторно</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="my_reports">Мои отчёты</string>
     <string name="scan_car">Просканировать автомобиль</string>
     <string name="logout_button">logout button</string>
     <string name="create_your_first_report">Создайте свой первый отчет</string>
     <string name="arrow_for_create_first_report">arrow for create first report</string>
+    <string name="report_about_find_off">Отчет о проверке</string>
+    <string name="front_part_of_car">Передняя часть автомобиля</string>
+    <string name="back_part_of_car">Задняя часть автомобиля</string>
+    <string name="left_part_of_car">Левая часть автомобиля</string>
+    <string name="right_part_of_car">Правая часть автомобиля</string>
 
 </resources>
