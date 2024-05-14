@@ -1,0 +1,9 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Файлы проекта и настройки IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+/.idea/
