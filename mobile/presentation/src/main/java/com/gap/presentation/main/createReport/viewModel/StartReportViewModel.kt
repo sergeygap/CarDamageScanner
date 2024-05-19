@@ -1,4 +1,4 @@
-package com.gap.presentation.main.viewModels
+package com.gap.presentation.main.createReport.viewModel
 
 import androidx.lifecycle.ViewModel
 

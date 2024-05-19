@@ -1,4 +1,4 @@
-package com.gap.presentation.main
+package com.gap.presentation.main.createReport
 
 import android.Manifest
 import android.app.Activity
@@ -14,7 +14,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -36,43 +38,21 @@ class SendPhotosFragment : Fragment() {
         ActivityResultContracts.RequestPermission(),
         ::onGotPermissionsResultForCamera
     )
+    private val galleryPermissionRequestLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+        ::onGotPermissionsResultForGallery
+    )
 
-    private val resultLauncherCameraFrontPart =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                binding.ivFrontPart.setImageBitmap(imageBitmap)
-            }
-            flag = PartOfCars.SOMETHING
-        }
-    private val resultLauncherCameraLeftPart =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                binding.ivLeftPart.setImageBitmap(imageBitmap)
-            }
-            flag = PartOfCars.SOMETHING
-        }
-    private val resultLauncherCameraBackPart =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                binding.ivBackPart.setImageBitmap(imageBitmap)
-            }
-            flag = PartOfCars.SOMETHING
-        }
-    private val resultLauncherCameraRightPart =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageBitmap = data?.extras?.get("data") as Bitmap
-                binding.ivRightPart.setImageBitmap(imageBitmap)
-            }
-            flag = PartOfCars.SOMETHING
-        }
+    private lateinit var resultLauncherCameraFrontPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherCameraLeftPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherCameraBackPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherCameraRightPart: ActivityResultLauncher<Intent>
+
+    private lateinit var resultLauncherGalleryFrontPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherGalleryLeftPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherGalleryBackPart: ActivityResultLauncher<Intent>
+    private lateinit var resultLauncherGalleryRightPart: ActivityResultLauncher<Intent>
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +64,20 @@ class SendPhotosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initialResultLauncher()
         workWithUI()
+    }
+
+    private fun initialResultLauncher() {
+        resultLauncherCameraFrontPart = resultLauncherCamera(binding.ivFrontPart)
+        resultLauncherCameraLeftPart = resultLauncherCamera(binding.ivLeftPart)
+        resultLauncherCameraBackPart = resultLauncherCamera(binding.ivBackPart)
+        resultLauncherCameraRightPart = resultLauncherCamera(binding.ivRightPart)
+        resultLauncherGalleryFrontPart = resultLauncherGallery(binding.ivFrontPart)
+        resultLauncherGalleryLeftPart = resultLauncherGallery(binding.ivLeftPart)
+        resultLauncherGalleryBackPart = resultLauncherGallery(binding.ivBackPart)
+        resultLauncherGalleryRightPart = resultLauncherGallery(binding.ivRightPart)
+
     }
 
     private fun workWithUI() {
@@ -95,7 +88,6 @@ class SendPhotosFragment : Fragment() {
             binding.ibBack.setOnClickListener {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
-
             binding.ivFrontPart.setOnClickListener {
                 flag = PartOfCars.FRONT
                 setOnClickListenersInCustomDialog(createAlertDialog())
@@ -120,17 +112,19 @@ class SendPhotosFragment : Fragment() {
     private fun setOnClickListenersInCustomDialog(binding: CustomDialogBinding) {
         listOf(binding.ivSelectPhoto, binding.tvSelectPhoto).forEach {
             it.setOnClickListener {
-//                checkPermissionsForGallery()
+                galleryPermissionRequestLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                clauseAlertDialog()
             }
         }
         listOf(binding.ivTakePhoto, binding.tvTakePhoto).forEach {
             it.setOnClickListener {
                 cameraPermissionRequestLauncher.launch(Manifest.permission.CAMERA)
-                alertDialog?.dismiss()
-                alertDialog = null
+                clauseAlertDialog()
             }
         }
     }
+
+
 
     private fun createAlertDialog(): CustomDialogBinding {
         val dialogBinding = CustomDialogBinding.inflate(layoutInflater)
@@ -160,15 +154,36 @@ class SendPhotosFragment : Fragment() {
             }
         }
     }
+    private fun onGotPermissionsResultForGallery(grantResult: Boolean) {
+        if (grantResult) {
+            onGalleryPermissionGranted()
+        } else {
+            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun onGalleryPermissionGranted() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        when (flag) {
+            PartOfCars.FRONT -> resultLauncherGalleryFrontPart.launch(intent)
+            PartOfCars.LEFT -> resultLauncherGalleryLeftPart.launch(intent)
+            PartOfCars.BACK -> resultLauncherGalleryBackPart.launch(intent)
+            PartOfCars.RIGHT -> resultLauncherGalleryRightPart.launch(intent)
+            PartOfCars.SOMETHING -> Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
 
     private fun onCameraPermissionGranted() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        when(flag) {
+        when (flag) {
             PartOfCars.FRONT -> resultLauncherCameraFrontPart.launch(intent)
             PartOfCars.LEFT -> resultLauncherCameraLeftPart.launch(intent)
             PartOfCars.BACK -> resultLauncherCameraBackPart.launch(intent)
             PartOfCars.RIGHT -> resultLauncherCameraRightPart.launch(intent)
-            PartOfCars.SOMETHING -> Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT).show()
+            PartOfCars.SOMETHING -> Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -198,6 +213,35 @@ class SendPhotosFragment : Fragment() {
                 .show()
         }
     }
+
+    private fun clauseAlertDialog() {
+        alertDialog?.dismiss()
+        alertDialog = null
+    }
+
+    private fun resultLauncherCamera(inputIV: ImageView): ActivityResultLauncher<Intent> {
+        return registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val imageBitmap = data?.extras?.get("data") as? Bitmap
+                imageBitmap?.let { inputIV.setImageBitmap(it) }
+            }
+            flag = PartOfCars.SOMETHING
+        }
+    }
+    private fun resultLauncherGallery(inputIV: ImageView): ActivityResultLauncher<Intent> {
+        return registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+                val imageUri = data?.data
+                imageUri?.let {
+                    inputIV.setImageURI(it)
+                }
+            }
+            flag = PartOfCars.SOMETHING
+        }
+    }
+
 
 
     override fun onDestroyView() {
