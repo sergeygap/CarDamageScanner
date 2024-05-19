@@ -8,7 +8,7 @@ object ScannerRepositoryImpl: ScannerRepository {
     private const val TITLE_TAG = "Отчет от 24.05"
 
     private val listReports = mutableListOf<Report>().apply {
-        repeat(100) {
+        repeat(10) {
             this.add(Report("$TITLE_TAG $it"))
         }
     }
