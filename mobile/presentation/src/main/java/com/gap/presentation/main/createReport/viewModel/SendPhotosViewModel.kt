@@ -15,10 +15,15 @@ class SendPhotosViewModel : ViewModel() {
     private val _reportLD = MutableLiveData<List<ReportItem>>()
     val reportLD
         get() = _reportLD
+    private val _stateLD = MutableLiveData<Boolean>()
+    val stateLD
+        get() = _stateLD
 
     fun exchangeFiles(files: List<File>) {
         viewModelScope.launch {
+            _stateLD.value = true
             _reportLD.postValue(exchangeFilesUseCase.invoke(files))
+            _stateLD.value = false
         }
     }
 }

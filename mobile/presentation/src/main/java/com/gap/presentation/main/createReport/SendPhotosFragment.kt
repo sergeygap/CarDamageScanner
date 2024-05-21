@@ -12,6 +12,7 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
@@ -22,6 +23,8 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import androidx.core.content.FileProvider.getUriForFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -33,6 +36,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import com.google.gson.Gson
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SendPhotosFragment : Fragment() {
 
@@ -138,6 +144,13 @@ class SendPhotosFragment : Fragment() {
                 }
             }
         }
+        viewModel.stateLD.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.INVISIBLE
+            }
+        }
     }
 
     private fun checkFullFileForButton() {
@@ -212,16 +225,51 @@ class SendPhotosFragment : Fragment() {
     }
 
     private fun onCameraPermissionGranted() {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         when (flag) {
-            PartOfCars.FRONT -> resultLauncherCameraFrontPart.launch(intent)
-            PartOfCars.LEFT -> resultLauncherCameraLeftPart.launch(intent)
-            PartOfCars.BACK -> resultLauncherCameraBackPart.launch(intent)
-            PartOfCars.RIGHT -> resultLauncherCameraRightPart.launch(intent)
-            PartOfCars.SOMETHING -> Toast.makeText(requireContext(), "error", Toast.LENGTH_SHORT)
-                .show()
+            PartOfCars.FRONT, PartOfCars.LEFT, PartOfCars.BACK, PartOfCars.RIGHT -> {
+                val file = createImageFile(flag)
+//                val photoURI = getUriForFile(file)
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+//                    putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                }
+                when (flag) {
+                    PartOfCars.FRONT -> resultLauncherCameraFrontPart.launch(intent)
+                    PartOfCars.LEFT -> resultLauncherCameraLeftPart.launch(intent)
+                    PartOfCars.BACK -> resultLauncherCameraBackPart.launch(intent)
+                    PartOfCars.RIGHT -> resultLauncherCameraRightPart.launch(intent)
+                    else -> {}
+                }
+            }
+
+            else -> Toast.makeText(
+                requireContext(),
+                "Invalid part of car selected",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
+
+    private fun createImageFile(partOfCar: PartOfCars): File {
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File =
+            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+        val imageFileName = "${partOfCar.name}_$timeStamp.png"
+        return File.createTempFile(
+            imageFileName, /* префикс */
+            ".png", /* суффикс */
+            storageDir /* директория */
+        )
+    }
+
+    private fun getUriForFile(file: File): Uri {
+        return FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            file
+        )
+    }
+
 
     private fun askUserForOpeningAppSettings() {
         val appSettingsIntent = Intent(
@@ -321,6 +369,7 @@ class SendPhotosFragment : Fragment() {
         return img
     }
 
+
     private fun rotateImage(img: Bitmap, degree: Float): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(degree)
@@ -328,9 +377,6 @@ class SendPhotosFragment : Fragment() {
         img.recycle()
         return rotatedImg
     }
-
-
-
 
     private fun getBitmapFromUri(uri: Uri): Bitmap? {
         return try {
@@ -383,7 +429,6 @@ class SendPhotosFragment : Fragment() {
         listPNGFiles.removeIf { it.name == newFile.name }
         listPNGFiles.add(newFile)
     }
-
 
 
     override fun onDestroyView() {
