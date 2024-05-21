@@ -26,7 +26,7 @@ class HomeAdapter : RecyclerView.Adapter<HomeViewHolder>() {
     override fun onBindViewHolder(viewHolder: HomeViewHolder, position: Int) {
         val reportsList = getListReports.invoke()
         val report = reportsList[position]
-        viewHolder.binding.tvDate.text = report.title
+        viewHolder.binding.tvDate.text = report.request_time
         onItemClickListener(viewHolder)
     }
 

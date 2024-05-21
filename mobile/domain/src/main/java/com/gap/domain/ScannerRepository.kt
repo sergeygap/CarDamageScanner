@@ -1,7 +1,9 @@
 package com.gap.domain
 
-import com.gap.domain.entitys.Report
+import com.gap.domain.entities.ReportItem
+import java.io.File
 
 interface ScannerRepository {
-    fun getListReports() : List<Report>
+    fun getListReports(): List<ReportItem>
+    suspend fun exchangeFiles(files: List<File>): List<ReportItem>
 }

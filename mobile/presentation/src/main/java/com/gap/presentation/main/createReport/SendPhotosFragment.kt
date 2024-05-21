@@ -6,6 +6,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,11 +21,16 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.gap.presentation.R
 import com.gap.presentation.databinding.CustomDialogBinding
 import com.gap.presentation.databinding.FragmentSendPhotosBinding
-
+import com.gap.presentation.main.createReport.viewModel.SendPhotosViewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class SendPhotosFragment : Fragment() {
 
@@ -53,6 +60,10 @@ class SendPhotosFragment : Fragment() {
     private lateinit var resultLauncherGalleryBackPart: ActivityResultLauncher<Intent>
     private lateinit var resultLauncherGalleryRightPart: ActivityResultLauncher<Intent>
 
+    private val listPNGFiles = mutableListOf<File>()
+    private lateinit var imageViews: List<ImageView>
+    private val viewModel: SendPhotosViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,11 +75,11 @@ class SendPhotosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initialResultLauncher()
+        initialCode()
         workWithUI()
     }
 
-    private fun initialResultLauncher() {
+    private fun initialCode() {
         resultLauncherCameraFrontPart = resultLauncherCamera(binding.ivFrontPart)
         resultLauncherCameraLeftPart = resultLauncherCamera(binding.ivLeftPart)
         resultLauncherCameraBackPart = resultLauncherCamera(binding.ivBackPart)
@@ -77,13 +88,22 @@ class SendPhotosFragment : Fragment() {
         resultLauncherGalleryLeftPart = resultLauncherGallery(binding.ivLeftPart)
         resultLauncherGalleryBackPart = resultLauncherGallery(binding.ivBackPart)
         resultLauncherGalleryRightPart = resultLauncherGallery(binding.ivRightPart)
-
+        imageViews = listOf(
+            binding.ivBackPart,
+            binding.ivFrontPart,
+            binding.ivLeftPart,
+            binding.ivRightPart
+        )
     }
 
     private fun workWithUI() {
         with(binding) {
             btnSend.setOnClickListener {
+                viewModel.exchangeFiles(listPNGFiles)
                 Toast.makeText(requireContext(), "SEND", Toast.LENGTH_SHORT).show()
+                listPNGFiles.forEach { file ->
+                    Log.d(TAG, "File: ${file.name}, Size: ${file.length()} bytes")
+                }
             }
             binding.ibBack.setOnClickListener {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -106,6 +126,15 @@ class SendPhotosFragment : Fragment() {
             }
 
         }
+        viewModel.timeLD.observe(viewLifecycleOwner) {
+            Log.d(TAG, "workWithUI: ${it.forEach { reportItem ->
+                reportItem.toString()
+            }}")
+        }
+    }
+
+    private fun checkFullFileForButton() {
+        binding.btnSend.isEnabled = imageViews.all { it.drawable != null }
     }
 
 
@@ -123,7 +152,6 @@ class SendPhotosFragment : Fragment() {
             }
         }
     }
-
 
 
     private fun createAlertDialog(): CustomDialogBinding {
@@ -154,6 +182,7 @@ class SendPhotosFragment : Fragment() {
             }
         }
     }
+
     private fun onGotPermissionsResultForGallery(grantResult: Boolean) {
         if (grantResult) {
             onGalleryPermissionGranted()
@@ -224,24 +253,80 @@ class SendPhotosFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
                 val imageBitmap = data?.extras?.get("data") as? Bitmap
-                imageBitmap?.let { inputIV.setImageBitmap(it) }
-            }
-            flag = PartOfCars.SOMETHING
-        }
-    }
-    private fun resultLauncherGallery(inputIV: ImageView): ActivityResultLauncher<Intent> {
-        return registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                val imageUri = data?.data
-                imageUri?.let {
-                    inputIV.setImageURI(it)
+                imageBitmap?.let {
+                    inputIV.setImageBitmap(it)
+                    saveBitmapToFile(it, fileNames(flag))
+                    checkFullFileForButton()
                 }
             }
             flag = PartOfCars.SOMETHING
         }
     }
 
+
+    private fun resultLauncherGallery(inputIV: ImageView): ActivityResultLauncher<Intent> {
+        return registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri = result.data?.data
+                imageUri?.let { uri ->
+                    inputIV.setImageURI(uri)
+                    val bitmap = getBitmapFromUri(uri)
+                    bitmap?.let {
+                        try {
+                            val filename = fileNames(flag)
+                            saveBitmapToFile(it, filename)
+                            checkFullFileForButton()
+                        } catch (e: IllegalArgumentException) {
+                            Log.e(TAG, "Invalid part of car selected", e)
+                        }
+                    }
+                }
+            }
+            flag = PartOfCars.SOMETHING
+        }
+    }
+
+    private fun getBitmapFromUri(uri: Uri): Bitmap? {
+        return try {
+            val inputStream = requireContext().contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+            bitmap
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting bitmap from Uri", e)
+            null
+        }
+    }
+
+
+    private fun fileNames(flag: PartOfCars): String {
+        return when (flag) {
+            PartOfCars.FRONT -> "front.png"
+            PartOfCars.LEFT -> "left.png"
+            PartOfCars.BACK -> "back.png"
+            PartOfCars.RIGHT -> "right.png"
+            PartOfCars.SOMETHING -> throw IllegalArgumentException("flag = SOMETHING")
+        }
+    }
+
+    private fun saveBitmapToFile(bitmap: Bitmap, filename: String) {
+        val context = requireContext()
+        val file = File(context.cacheDir, filename)
+        file.createNewFile()
+
+        var fos: FileOutputStream? = null
+        try {
+            fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
+            fos.close()
+            listPNGFiles.add(file)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            fos?.close()
+        }
+    }
 
 
     override fun onDestroyView() {

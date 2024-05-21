@@ -2,11 +2,12 @@ package com.gap.domain.useCases
 
 import com.gap.domain.ScannerRepository
 import com.gap.domain.entities.ReportItem
+import java.io.File
 
-class GetListReportsUseCase(
+class ExchangeFilesUseCase(
     private val repository: ScannerRepository
 ) {
-    operator fun invoke(): List<ReportItem> {
-        return repository.getListReports()
+    suspend operator fun invoke(files: List<File>): List<ReportItem> {
+        return repository.exchangeFiles(files)
     }
 }
