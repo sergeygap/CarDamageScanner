@@ -3,11 +3,13 @@ package com.gap.presentation.main.createReport
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.Image
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -22,7 +24,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.gap.presentation.R
 import com.gap.presentation.databinding.CustomDialogBinding
@@ -31,6 +32,7 @@ import com.gap.presentation.main.createReport.viewModel.SendPhotosViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import com.google.gson.Gson
 
 class SendPhotosFragment : Fragment() {
 
@@ -126,10 +128,15 @@ class SendPhotosFragment : Fragment() {
             }
 
         }
-        viewModel.timeLD.observe(viewLifecycleOwner) {
-            Log.d(TAG, "workWithUI: ${it.forEach { reportItem ->
-                reportItem.toString()
-            }}")
+        viewModel.reportLD.observe(viewLifecycleOwner) {
+            Log.d(TAG, "workWithUI: working")
+            viewModel.reportLD.observe(viewLifecycleOwner) { reportList ->
+                Log.d(TAG, "workWithUI: working")
+                val gson = Gson()
+                reportList.forEach {
+                    Log.d(TAG, "Report item: ${gson.toJson(it)}")
+                }
+            }
         }
     }
 
@@ -253,16 +260,21 @@ class SendPhotosFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val data: Intent? = result.data
                 val imageBitmap = data?.extras?.get("data") as? Bitmap
-                imageBitmap?.let {
-                    inputIV.setImageBitmap(it)
-                    saveBitmapToFile(it, fileNames(flag))
+                imageBitmap?.let { bitmap ->
+                    val imageUri = data.data
+                    val correctedImage = if (imageUri != null) {
+                        rotateImageIfRequired(requireContext(), bitmap, imageUri)
+                    } else {
+                        bitmap
+                    }
+                    inputIV.setImageBitmap(correctedImage)
+                    saveBitmapToFile(correctedImage, fileNames(flag))
                     checkFullFileForButton()
                 }
             }
             flag = PartOfCars.SOMETHING
         }
     }
-
 
     private fun resultLauncherGallery(inputIV: ImageView): ActivityResultLauncher<Intent> {
         return registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -285,6 +297,40 @@ class SendPhotosFragment : Fragment() {
             flag = PartOfCars.SOMETHING
         }
     }
+
+    private fun rotateImageIfRequired(context: Context, img: Bitmap, uri: Uri): Bitmap {
+        val input = context.contentResolver.openInputStream(uri)
+        val ei: ExifInterface
+        try {
+            if (input != null) {
+                ei = ExifInterface(input)
+                val orientation = ei.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL
+                )
+                return when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180f)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270f)
+                    else -> img
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return img
+    }
+
+    private fun rotateImage(img: Bitmap, degree: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degree)
+        val rotatedImg = Bitmap.createBitmap(img, 0, 0, img.width, img.height, matrix, true)
+        img.recycle()
+        return rotatedImg
+    }
+
+
+
 
     private fun getBitmapFromUri(uri: Uri): Bitmap? {
         return try {
@@ -312,6 +358,10 @@ class SendPhotosFragment : Fragment() {
     private fun saveBitmapToFile(bitmap: Bitmap, filename: String) {
         val context = requireContext()
         val file = File(context.cacheDir, filename)
+
+        if (file.exists()) {
+            file.delete()
+        }
         file.createNewFile()
 
         var fos: FileOutputStream? = null
@@ -320,13 +370,20 @@ class SendPhotosFragment : Fragment() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fos.flush()
             fos.close()
-            listPNGFiles.add(file)
+            updateFileList(file)
         } catch (e: IOException) {
             e.printStackTrace()
         } finally {
             fos?.close()
         }
     }
+
+
+    private fun updateFileList(newFile: File) {
+        listPNGFiles.removeIf { it.name == newFile.name }
+        listPNGFiles.add(newFile)
+    }
+
 
 
     override fun onDestroyView() {

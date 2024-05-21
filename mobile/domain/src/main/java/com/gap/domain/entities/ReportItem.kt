@@ -5,4 +5,8 @@ data class ReportItem(
     val part: String = "",
     val request_time: String = "",
     val urls: String = ""
-)
+) {
+    override fun toString(): String {
+        return super.toString()
+    }
+}
