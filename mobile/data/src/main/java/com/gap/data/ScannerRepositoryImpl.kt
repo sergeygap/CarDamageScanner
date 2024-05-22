@@ -14,9 +14,9 @@ object ScannerRepositoryImpl: ScannerRepository {
     private val scannerApi = RetrofitInstance.api
 
     private val listReports = mutableListOf<ReportItem>().apply {
-        repeat(10) {
-            this.add(ReportItem(request_time = "$TITLE_TAG $it"))
-        }
+//        repeat(10) {
+//            this.add(ReportItem(request_time = "$TITLE_TAG $it"))
+//        }
     }
 
     override fun getListReports(): List<ReportItem> {

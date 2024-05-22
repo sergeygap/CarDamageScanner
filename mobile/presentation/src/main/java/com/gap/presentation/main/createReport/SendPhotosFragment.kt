@@ -28,9 +28,11 @@ import androidx.core.content.FileProvider.getUriForFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.gap.domain.entities.ReportItem
 import com.gap.presentation.R
 import com.gap.presentation.databinding.CustomDialogBinding
 import com.gap.presentation.databinding.FragmentSendPhotosBinding
+import com.gap.presentation.main.ReportFragment.Companion.REPORT_ITEM_KEY
 import com.gap.presentation.main.createReport.viewModel.SendPhotosViewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -108,7 +110,6 @@ class SendPhotosFragment : Fragment() {
         with(binding) {
             btnSend.setOnClickListener {
                 viewModel.exchangeFiles(listPNGFiles)
-                Toast.makeText(requireContext(), "SEND", Toast.LENGTH_SHORT).show()
                 listPNGFiles.forEach { file ->
                     Log.d(TAG, "File: ${file.name}, Size: ${file.length()} bytes")
                 }
@@ -143,6 +144,7 @@ class SendPhotosFragment : Fragment() {
                     Log.d(TAG, "Report item: ${gson.toJson(it)}")
                 }
             }
+            navigateWithReportItem(it)
         }
         viewModel.stateLD.observe(viewLifecycleOwner) {
             if (it) {
@@ -152,6 +154,14 @@ class SendPhotosFragment : Fragment() {
             }
         }
     }
+
+    private fun navigateWithReportItem(reportItems: List<ReportItem>) {
+        val bundle = Bundle().apply {
+            putSerializable(REPORT_ITEM_KEY, ArrayList(reportItems))
+        }
+        findNavController().navigate(R.id.action_sendPhotosFragment_to_reportFragment, bundle)
+    }
+
 
     private fun checkFullFileForButton() {
         binding.btnSend.isEnabled = imageViews.all { it.drawable != null }
